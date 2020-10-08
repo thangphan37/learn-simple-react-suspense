@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import createResource from './Exercise1';
 import { ErrorBoundary } from 'react-error-boundary'
-let promiseCommon = fetch(`https://jsonplaceholder.typicode.com/users/1`).then(r => r.json());
+let promiseCommon = id => fetch(`https://jsonplaceholder.typicode.com/users/${id}`).then(r => r.json());
 
 function RobotForm({
   robotName: externalRobotName,
@@ -89,7 +89,13 @@ function Exercise2() {
     if (!robotName) {
       setRobotResource(null);
     } else {
-      const source = createResource(promiseCommon);
+      const ids = [0,1,2,3,4,5,6,7,8,9];
+      ids.forEach((id, i) => {
+        const j = Math.floor(Math.random()*i);
+        [ids[i], ids[j]] = [ids[j], ids[i]];
+      });
+
+      const source = createResource(promiseCommon(ids[0]));
       setRobotResource(source);
     }
   }, [robotName]);
