@@ -81,10 +81,23 @@ const SUSPENSE_CONFIG = {
   timeoutMs: 4000
 }
 
-const RobotContext = React.createContext();
+const RobotResourceCacheContext = React.createContext();
 
-function RobotProvider({children}) {
+function RobotCacheProvider({children, cacheTime}) {
   const cache = React.useRef({});
+  const expirations = React.useRef({});
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      for(const [name, time] of Object.entries(expirations.current)) {
+        if(time < Date.now()) {
+          delete cache.current[name];
+        }
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  })
 
   const getRobotResource = React.useCallback((name) => {
     // const lowerName = name.toLowerCase();
@@ -94,24 +107,26 @@ function RobotProvider({children}) {
       cache.current[name] = resource
     }
 
+    expirations.current[name] = Date.now() + cacheTime
     return resource;
-  }, [])
+  }, [cacheTime]);
+
   return (
-    <RobotContext.Provider value={getRobotResource}>
+    <RobotResourceCacheContext.Provider value={getRobotResource}>
       {children}
-    </RobotContext.Provider>
+    </RobotResourceCacheContext.Provider>
   )
 }
 
-function useRobotContext() {
-  return React.useContext(RobotContext);
+function useRobotResourceCacheContext() {
+  return React.useContext(RobotResourceCacheContext);
 }
 
 function App() {
   const [robotName, setRobotName] = React.useState('');
   const [robotResource, setRobotResource] = React.useState(null);
   const [startTransition, isPending] = React.unstable_useTransition(SUSPENSE_CONFIG);
-  const getRobotResource = useRobotContext();
+  const getRobotResource = useRobotResourceCacheContext();
 
   function onSubmit(newRobotName) {
     setRobotName(newRobotName);
@@ -152,9 +167,9 @@ function App() {
 
 function Exercise4() {
   return (
-    <RobotProvider>
+    <RobotCacheProvider cacheTime={5000}>
       <App />
-    </RobotProvider>
+    </RobotCacheProvider>
   )
 }
 
