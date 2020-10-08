@@ -45,7 +45,7 @@ robotPromise = promiseCommon
     e => robotError = e
   );
 
-function createResource(promise) {
+export default function createResource(promise) {
   let status = 'pending';
 
   let result = promise.then(
@@ -99,6 +99,7 @@ function RobotRefactor() {
 function Exercise1() {
   return (
     <>
+      <h2>Exercise1</h2>
       <ErrorBoundary fallback={<h2>Could not fetch robot.</h2>}>
         <Suspense fallback={<div>Loading Robot...</div>}>
           <Robot />
