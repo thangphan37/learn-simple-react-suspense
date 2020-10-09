@@ -3,6 +3,20 @@ import createResource from './Exercise1';
 import { ErrorBoundary } from 'react-error-boundary'
 let promiseCommon = id => fetch(`https://jsonplaceholder.typicode.com/users/${id}`).then(r => r.json());
 
+
+/*
+  Cache common:
+  const promiseCache = {};
+  function MySuspendingComponent({value}) {
+    let resource = promiseCache[value];
+    if(!resource) {
+      resource = doAsyncThing(value);
+      promiseCache[value] = resource;
+    }
+
+    return <div>{resource.read()}</div>
+  }
+*/
 function RobotForm({
   robotName: externalRobotName,
   initialRobotName = externalRobotName || '',
